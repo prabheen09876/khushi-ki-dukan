@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://studiokhushi.example/sitemap.xml
+Sitemap: https://prabheen09876.github.io/khushi-ki-dukan/sitemap.xml

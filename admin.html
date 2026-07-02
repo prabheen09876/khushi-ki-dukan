@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Studio Admin — Studio Khushi</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Manrope:wght@300;400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    /* ---- Admin-only layout (reuses the site's tokens) ---- */
+    body { min-height: 100vh; }
+    .ad-wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--gutter); }
+
+    /* Login */
+    .ad-login { min-height: 100vh; display: grid; place-items: center; padding: 2rem var(--gutter); }
+    .ad-login__card { width: 100%; max-width: 420px; background: var(--card); border: 1px solid var(--card-edge);
+      border-radius: var(--radius-lg); padding: clamp(1.6rem, 4vw, 2.6rem); box-shadow: var(--shadow); }
+    .ad-login__card h1 { font-family: var(--serif); font-weight: 400; font-size: 1.9rem; letter-spacing: -0.01em; }
+    .ad-login__card .eyebrow { margin-bottom: 0.8rem; }
+    .ad-login__err { color: #c0392b; font-family: var(--mono); font-size: 0.78rem; min-height: 1.2em; margin-top: 0.2rem; }
+    [data-theme="dark"] .ad-login__err { color: #ff8a7a; }
+
+    /* Topbar */
+    .ad-top { position: sticky; top: 0; z-index: 20; background: var(--glass);
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line); }
+    .ad-top__in { display: flex; align-items: center; gap: 1rem; padding: 0.9rem var(--gutter); max-width: 1120px; margin: 0 auto; }
+    .ad-brand { font-family: var(--serif); font-size: 1.15rem; letter-spacing: -0.01em; }
+    .ad-brand small { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); display: block; margin-top: 2px; }
+    .ad-top__spacer { flex: 1; }
+    .ad-top__btn { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 0.55em 1em; border: 1px solid var(--line); border-radius: 100px; color: var(--fg-soft); transition: 0.25s var(--ease); }
+    .ad-top__btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Warning banner (not configured) */
+    .ad-banner { background: var(--gold-wash); border-bottom: 1px solid var(--line); }
+    .ad-banner__in { max-width: 1120px; margin: 0 auto; padding: 0.75rem var(--gutter);
+      font-size: 0.86rem; color: var(--fg-soft); }
+    .ad-banner b { color: var(--accent); }
+
+    /* Tabs */
+    .ad-tabs { display: flex; gap: 0.4rem; flex-wrap: wrap; padding: 1.6rem 0 0.4rem; }
+    .ad-tab { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 0.6em 1.1em; border-radius: 100px; border: 1px solid var(--line); color: var(--fg-mute); transition: 0.25s var(--ease); }
+    .ad-tab.active { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+    .ad-panel { display: none; padding: 1.6rem 0 5rem; }
+    .ad-panel.active { display: block; }
+    .ad-panel__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
+    .ad-panel__head h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.5rem, 4vw, 2.2rem); letter-spacing: -0.01em; }
+    .ad-panel__head p { color: var(--fg-mute); font-size: 0.9rem; margin-top: 0.3rem; }
+
+    .ad-card { background: var(--card); border: 1px solid var(--card-edge); border-radius: var(--radius-lg);
+      padding: clamp(1.2rem, 3vw, 2rem); box-shadow: var(--shadow-sm); }
+    .ad-card + .ad-card { margin-top: 1.2rem; }
+
+    /* Forms */
+    .ad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem 1.2rem; }
+    .ad-field { display: flex; flex-direction: column; gap: 0.45rem; }
+    .ad-field.full { grid-column: 1 / -1; }
+    .ad-field label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-mute); }
+    .ad-field input, .ad-field textarea, .ad-field select {
+      width: 100%; font: inherit; font-size: 0.95rem; color: var(--fg); background: var(--bg);
+      border: 1px solid var(--line); border-radius: var(--radius); padding: 0.7em 0.85em; transition: border-color 0.2s var(--ease); }
+    .ad-field input:focus, .ad-field textarea:focus, .ad-field select:focus { outline: none; border-color: var(--accent); }
+    .ad-field textarea { min-height: 96px; resize: vertical; line-height: 1.55; }
+
+    .ad-actions { display: flex; gap: 0.7rem; flex-wrap: wrap; align-items: center; margin-top: 1.4rem; }
+    .ad-hint { font-size: 0.82rem; color: var(--fg-mute); }
+
+    /* Skills editor */
+    .ad-skill { display: grid; grid-template-columns: 1fr 96px auto; gap: 0.7rem; align-items: center; margin-bottom: 0.7rem; }
+    .ad-iconbtn { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid var(--line);
+      border-radius: var(--radius); color: var(--fg-mute); transition: 0.2s var(--ease); flex: none; }
+    .ad-iconbtn:hover { border-color: #c0392b; color: #c0392b; }
+
+    /* Projects list */
+    .ad-proj { display: flex; gap: 1rem; align-items: center; padding: 0.9rem; border: 1px solid var(--card-edge);
+      border-radius: var(--radius-lg); background: var(--card); margin-bottom: 0.8rem; }
+    .ad-proj__thumb { width: 64px; height: 64px; border-radius: var(--radius); overflow: hidden; flex: none;
+      background: var(--bg-alt); border: 1px solid var(--line); display: grid; place-items: center; }
+    .ad-proj__thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .ad-proj__thumb span { font-family: var(--mono); font-size: 0.6rem; color: var(--fg-mute); }
+    .ad-proj__body { flex: 1; min-width: 0; }
+    .ad-proj__body h4 { font-family: var(--serif); font-weight: 500; font-size: 1.1rem; }
+    .ad-proj__body p { font-size: 0.82rem; color: var(--fg-mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ad-proj__cat { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+    .ad-proj__acts { display: flex; gap: 0.4rem; flex: none; }
+    .ad-mini { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase;
+      padding: 0.5em 0.9em; border: 1px solid var(--line); border-radius: 100px; transition: 0.2s var(--ease); }
+    .ad-mini:hover { border-color: var(--accent); color: var(--accent); }
+    .ad-mini.danger:hover { border-color: #c0392b; color: #c0392b; }
+
+    /* Image uploader */
+    .ad-drop { border: 1.5px dashed var(--line); border-radius: var(--radius-lg); padding: 1.4rem; text-align: center;
+      color: var(--fg-mute); font-size: 0.9rem; cursor: pointer; transition: 0.2s var(--ease); }
+    .ad-drop:hover, .ad-drop.over { border-color: var(--accent); color: var(--accent); background: var(--gold-wash); }
+    .ad-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 0.7rem; margin-top: 1rem; }
+    .ad-thumb { position: relative; aspect-ratio: 1; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--card-edge); }
+    .ad-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .ad-thumb__x { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(0,0,0,0.6); color: #fff; display: grid; place-items: center; font-size: 0.8rem; line-height: 1; }
+    .ad-thumb__cover { position: absolute; bottom: 4px; left: 4px; font-family: var(--mono); font-size: 0.55rem;
+      letter-spacing: 0.08em; text-transform: uppercase; background: var(--accent); color: #fff; padding: 2px 6px; border-radius: 100px; }
+
+    .ad-empty { text-align: center; padding: 2.4rem 1rem; color: var(--fg-mute); border: 1.5px dashed var(--line); border-radius: var(--radius-lg); }
+
+    /* Toast */
+    .ad-toast { position: fixed; left: 50%; bottom: 1.6rem; transform: translate(-50%, 140%);
+      background: var(--fg); color: var(--bg); padding: 0.8em 1.3em; border-radius: 100px; font-size: 0.88rem;
+      box-shadow: var(--shadow); z-index: 60; transition: transform 0.4s var(--ease); max-width: 90vw; }
+    .ad-toast.show { transform: translate(-50%, 0); }
+    .ad-toast.err { background: #c0392b; color: #fff; }
+
+    .ad-spin { display: inline-block; width: 15px; height: 15px; border: 2px solid currentColor; border-right-color: transparent;
+      border-radius: 50%; animation: adspin 0.7s linear infinite; vertical-align: -2px; }
+    @keyframes adspin { to { transform: rotate(360deg); } }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 720px) {
+      .ad-grid { grid-template-columns: 1fr; }
+      .ad-proj { flex-wrap: wrap; }
+      .ad-proj__acts { width: 100%; justify-content: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ LOGIN ============ -->
+  <div class="ad-login" id="loginView">
+    <form class="ad-login__card" id="loginForm" novalidate>
+      <p class="eyebrow">Studio Khushi — Admin</p>
+      <h1>Welcome back.</h1>
+      <p class="ad-hint" style="margin:0.6rem 0 1.6rem">Sign in to edit your site content.</p>
+      <div class="ad-field" style="margin-bottom:1rem">
+        <label for="adId">Admin ID</label>
+        <input id="adId" name="id" type="text" autocomplete="username" placeholder="admin" required />
+      </div>
+      <div class="ad-field">
+        <label for="adPw">Password</label>
+        <input id="adPw" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+      </div>
+      <p class="ad-login__err" id="loginErr" role="alert" aria-live="polite"></p>
+      <div class="ad-actions" style="margin-top:0.6rem">
+        <button class="btn" type="submit" style="width:100%;justify-content:center">Sign in <span class="btn__arrow" aria-hidden="true">↗</span></button>
+      </div>
+      <p class="ad-hint" style="margin-top:1.4rem;text-align:center">
+        <a href="index.html" style="color:var(--accent)">← Back to website</a>
+      </p>
+    </form>
+  </div>
+
+  <!-- ============ DASHBOARD ============ -->
+  <div id="dashView" hidden>
+    <header class="ad-top">
+      <div class="ad-top__in">
+        <div class="ad-brand">Studio Khushi<small>Admin</small></div>
+        <div class="ad-top__spacer"></div>
+        <button class="ad-top__btn theme-toggle" id="themeToggle" aria-label="Toggle theme">Theme</button>
+        <a class="ad-top__btn" href="index.html" target="_blank" rel="noopener">View site ↗</a>
+        <button class="ad-top__btn" id="logoutBtn">Log out</button>
+      </div>
+    </header>
+
+    <div class="ad-banner" id="cfgBanner" hidden>
+      <div class="ad-banner__in">
+        <b>Demo mode.</b> Supabase isn’t connected yet, so changes can’t be saved.
+        Add your keys in <b>assets/js/supabase-config.js</b> and run <b>supabase/schema.sql</b>. See <b>ADMIN.md</b>.
+      </div>
+    </div>
+
+    <div class="ad-wrap">
+      <nav class="ad-tabs" role="tablist">
+        <button class="ad-tab active" data-tab="home" role="tab">Home</button>
+        <button class="ad-tab" data-tab="projects" role="tab">Projects</button>
+        <button class="ad-tab" data-tab="contact" role="tab">Contact</button>
+      </nav>
+
+      <!-- ---- HOME ---- -->
+      <section class="ad-panel active" id="tab-home" role="tabpanel">
+        <div class="ad-panel__head">
+          <div>
+            <h2>Home page</h2>
+            <p>The headline, intro line and skills shown at the top of your site.</p>
+          </div>
+        </div>
+
+        <form class="ad-card" id="homeForm">
+          <div class="ad-grid">
+            <div class="ad-field full">
+              <label for="heroTitle">Hero title</label>
+              <textarea id="heroTitle" placeholder="Designing Products, Patterns & Visual Stories."></textarea>
+            </div>
+            <div class="ad-field full">
+              <label for="heroDesc">Hero description</label>
+              <textarea id="heroDesc" placeholder="A short line that introduces your work."></textarea>
+            </div>
+          </div>
+
+          <div class="ad-field full" style="margin-top:1.4rem">
+            <label>Skills</label>
+            <div id="skillsList"></div>
+            <button type="button" class="ad-mini" id="addSkill" style="align-self:flex-start;margin-top:0.4rem">+ Add skill</button>
+          </div>
+
+          <div class="ad-actions">
+            <button class="btn" type="submit" id="homeSave">Save changes</button>
+            <span class="ad-hint">Saved changes appear on your site after a refresh.</span>
+          </div>
+        </form>
+      </section>
+
+      <!-- ---- PROJECTS ---- -->
+      <section class="ad-panel" id="tab-projects" role="tabpanel">
+        <div class="ad-panel__head">
+          <div>
+            <h2>Projects</h2>
+            <p>Add, edit and remove the case studies in your portfolio.</p>
+          </div>
+          <button class="btn" id="newProject">+ New project</button>
+        </div>
+
+        <!-- list -->
+        <div id="projectsWrap">
+          <div id="projectsList"></div>
+          <div class="ad-empty" id="projectsEmpty" hidden>No projects yet. Click <b>New project</b> to add your first one.</div>
+        </div>
+
+        <!-- editor -->
+        <div class="ad-card" id="projectEditor" hidden>
+          <div class="ad-panel__head" style="margin-bottom:1.2rem">
+            <h2 id="editorTitle" style="font-size:1.4rem">New project</h2>
+            <button class="ad-mini" id="editorClose">← Back to list</button>
+          </div>
+          <form id="projectForm">
+            <input type="hidden" id="pId" />
+            <div class="ad-grid">
+              <div class="ad-field">
+                <label for="pTitle">Project title</label>
+                <input id="pTitle" type="text" placeholder="Marigold Season" required />
+              </div>
+              <div class="ad-field">
+                <label for="pCategory">Category</label>
+                <input id="pCategory" type="text" list="catList" placeholder="Surface Pattern" />
+                <datalist id="catList">
+                  <option>Surface Pattern</option><option>Textile Prints</option><option>Product Design</option>
+                  <option>Furniture Design</option><option>Packaging</option><option>Branding</option>
+                  <option>Interior Design</option><option>Pattern Making</option>
+                </datalist>
+              </div>
+              <div class="ad-field full">
+                <label for="pIntro">Introduction</label>
+                <textarea id="pIntro" placeholder="One or two lines that open the case study."></textarea>
+              </div>
+              <div class="ad-field full">
+                <label for="pDescription">Description</label>
+                <textarea id="pDescription" placeholder="What the project is, in a paragraph."></textarea>
+              </div>
+              <div class="ad-field full">
+                <label for="pObjective">Objective</label>
+                <textarea id="pObjective" placeholder="The brief and the goal."></textarea>
+              </div>
+              <div class="ad-field full">
+                <label for="pProcess">Design process</label>
+                <textarea id="pProcess" placeholder="How you approached it, step by step."></textarea>
+              </div>
+              <div class="ad-field full">
+                <label for="pMaterials">Materials used</label>
+                <textarea id="pMaterials" placeholder="Substrates, tools, techniques, finishes."></textarea>
+              </div>
+              <div class="ad-field full">
+                <label for="pOutcome">Final outcome</label>
+                <textarea id="pOutcome" placeholder="The result and its impact."></textarea>
+              </div>
+            </div>
+
+            <div class="ad-field full" style="margin-top:1.4rem">
+              <label>Images <span class="ad-hint" style="text-transform:none;letter-spacing:0">— the first image is the cover</span></label>
+              <div class="ad-drop" id="imgDrop">
+                <span id="imgDropText">Click to upload images, or drop them here</span>
+              </div>
+              <input type="file" id="imgInput" accept="image/*" multiple hidden />
+              <div class="ad-thumbs" id="imgThumbs"></div>
+            </div>
+
+            <div class="ad-actions">
+              <button class="btn" type="submit" id="projectSave">Save project</button>
+              <button class="btn btn--ghost" type="button" id="projectCancel">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ---- CONTACT ---- -->
+      <section class="ad-panel" id="tab-contact" role="tabpanel">
+        <div class="ad-panel__head">
+          <div>
+            <h2>Contact information</h2>
+            <p>Shown in the contact section and footer of your site.</p>
+          </div>
+        </div>
+        <form class="ad-card" id="contactForm">
+          <div class="ad-grid">
+            <div class="ad-field"><label for="cName">Name</label><input id="cName" type="text" placeholder="Khushi" /></div>
+            <div class="ad-field"><label for="cPhone">Phone number</label><input id="cPhone" type="text" placeholder="+91 00000 00000" /></div>
+            <div class="ad-field"><label for="cEmail">Email address</label><input id="cEmail" type="email" placeholder="hello@studiokhushi.com" /></div>
+            <div class="ad-field"><label for="cLocation">Location</label><input id="cLocation" type="text" placeholder="Jaipur, India" /></div>
+            <div class="ad-field"><label for="cLinkedin">LinkedIn</label><input id="cLinkedin" type="url" placeholder="https://linkedin.com/in/…" /></div>
+            <div class="ad-field"><label for="cInstagram">Instagram</label><input id="cInstagram" type="url" placeholder="https://instagram.com/…" /></div>
+            <div class="ad-field"><label for="cBehance">Behance</label><input id="cBehance" type="url" placeholder="https://behance.net/…" /></div>
+          </div>
+          <div class="ad-actions">
+            <button class="btn" type="submit" id="contactSave">Save changes</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+
+  <div class="ad-toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Supabase client + data layer + admin logic -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>

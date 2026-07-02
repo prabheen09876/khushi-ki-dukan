@@ -104,6 +104,11 @@
   /* small helpers */
   const el = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
   const swatchDots = (keys) => `<span class="dots">${keys.map(k => `<i style="background:${PE.PALETTES[k][1]}"></i>`).join('')}</span>`;
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+
+  /* shared reveal observer (also used to animate DB-injected nodes) */
+  let revealIO = null;
+  const observeNode = (n) => { if (revealIO && n) revealIO.observe(n); };
 
   /* ---------------------------------------------------------
      RENDER: Portfolio (masonry swatches)
@@ -414,7 +419,7 @@
      Reveal on scroll + skill bars
      --------------------------------------------------------- */
   function reveals() {
-    const io = new IntersectionObserver((entries, obs) => {
+    revealIO = new IntersectionObserver((entries, obs) => {
       entries.forEach(en => {
         if (en.isIntersecting) {
           en.target.classList.add('in');
@@ -427,8 +432,8 @@
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
     // stagger siblings within a grid
-    $$('.rv').forEach((n, i) => { n.style.transitionDelay = (i % 4) * 0.07 + 's'; io.observe(n); });
-    $$('.skill__bar').forEach(b => io.observe(b));
+    $$('.rv').forEach((n, i) => { n.style.transitionDelay = (i % 4) * 0.07 + 's'; revealIO.observe(n); });
+    $$('.skill__bar').forEach(b => revealIO.observe(b));
   }
 
   /* ---------------------------------------------------------
@@ -505,6 +510,92 @@
   }
 
   /* ---------------------------------------------------------
+     Live content from Supabase (via Store) — patched in after
+     the default render so first paint is unchanged and nothing
+     breaks when Supabase isn't configured yet.
+     --------------------------------------------------------- */
+  const CAT_THEME = {
+    'Surface Pattern': 'Floral', 'Textile Prints': 'Ethnic', 'Product Design': 'Modern',
+    'Furniture Design': 'Boho', 'Packaging': 'Nature', 'Branding': 'Luxury',
+    'Interior Design': 'Geometric', 'Pattern Making': 'Abstract'
+  };
+  const catTheme = (cat) => CAT_THEME[cat] || 'Abstract';
+
+  function projectCard(p, i) {
+    const tall = i % 3 === 1 ? 'aspect-ratio:3/4' : (i % 3 === 2 ? 'aspect-ratio:4/3' : 'aspect-ratio:1');
+    const cover = p.images && p.images[0];
+    const pal = PE.PALETTE_KEYS[i % PE.PALETTE_KEYS.length];
+    const art = cover
+      ? `<img src="${esc(cover)}" alt="${esc(p.title)}" loading="lazy" style="width:100%;height:100%;object-fit:cover" />`
+      : PE.makePattern(catTheme(p.category), 7 + i * 13, pal);
+    const desc = p.introduction || p.description || '';
+    return el(`
+      <a class="swatch rv" href="project.html?id=${encodeURIComponent(p.id)}" data-cursor="Open">
+        <div class="swatch__art" data-cat="${esc(p.category)}" style="${tall}">${art}</div>
+        <div class="swatch__body">
+          <h3 class="swatch__title">${esc(p.title)}</h3>
+          <p class="swatch__desc">${esc(desc)}</p>
+          <div class="swatch__spec"><span class="chip chip--gold">${esc(p.category)}</span></div>
+        </div>
+      </a>`);
+  }
+
+  function patchHero(content) {
+    const titleEl = $('.hero__title');
+    if (titleEl && content.hero_title && content.hero_title !== Store.DEFAULT_CONTENT.hero_title) {
+      titleEl.innerHTML = content.hero_title.trim().split(/\s+/)
+        .map(w => `<span class="word"><span>${esc(w)}</span></span>`).join(' ');
+    }
+    const leadEl = $('.hero__lead');
+    if (leadEl && content.hero_description) leadEl.textContent = content.hero_description;
+  }
+
+  function patchSkills(skills) {
+    const wrap = $('.skills');
+    if (!wrap || !skills || !skills.length) return;
+    wrap.innerHTML = skills.map(s => `
+      <div class="skill">
+        <div class="skill__top"><span>${esc(s.name)}</span><span class="mono">${esc(s.level)}</span></div>
+        <div class="skill__bar rv"><i data-val="${esc(s.level)}"></i></div>
+      </div>`).join('');
+    $$('.skill__bar', wrap).forEach(observeNode);
+  }
+
+  function patchContact(k) {
+    if (!k) return;
+    const rows = $$('.contact__info .info-row');
+    // rows: 0 Email, 1 Phone, 2 Studio, 3 Follow
+    if (rows[0]) { const a = rows[0].querySelector('a'); if (a && k.email) { a.textContent = k.email; a.href = 'mailto:' + k.email; } }
+    if (rows[1]) { const a = rows[1].querySelector('a'); if (a && k.phone) { a.textContent = k.phone; a.href = 'tel:' + k.phone.replace(/\s+/g, ''); } }
+    if (rows[2]) { const p = rows[2].querySelector('p'); if (p && k.location) p.textContent = k.location; }
+    const socials = { Instagram: k.instagram, Behance: k.behance, LinkedIn: k.linkedin };
+    Object.keys(socials).forEach(label => {
+      const url = socials[label];
+      const a = $(`.socials a[aria-label="${label}"]`);
+      if (a && url) { a.href = url; a.target = '_blank'; a.rel = 'noopener'; }
+    });
+    // Instagram section "Follow along" link
+    if (k.instagram) { const ig = $('#instagram .tlink'); if (ig) ig.href = k.instagram; }
+  }
+
+  function applyStoreOverrides() {
+    if (!window.Store) return;
+    Store.getContent().then(content => {
+      patchHero(content);
+      patchSkills(content.skills);
+      patchContact(content.contact);
+    }).catch(() => {});
+    Store.getProjects().then(projects => {
+      if (!projects || !projects.length) return; // keep the demo grid when DB is empty
+      const grid = $('#portfolioGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      projects.forEach((p, i) => { const c = projectCard(p, i); grid.appendChild(c); observeNode(c); });
+      projects.forEach(p => SEARCH_INDEX.push({ name: p.title, tag: 'Project' }));
+    }).catch(() => {});
+  }
+
+  /* ---------------------------------------------------------
      Year + init
      --------------------------------------------------------- */
   function boot() {
@@ -516,6 +607,7 @@
     renderQuotes(); renderServices(); renderInstagram();
     preloader(); navBehaviour(); menus(); search(); lightbox();
     reveals(); cursor(); scrollExtras(); cookie(); forms();
+    applyStoreOverrides();
     // PWA / offline caching — only over http(s), skipped on file://
     if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
       window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));

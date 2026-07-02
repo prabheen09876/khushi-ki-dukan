@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://studiokhushi.example/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://studiokhushi.example/index.html#portfolio</loc><priority>0.9</priority></url>
-  <url><loc>https://studiokhushi.example/index.html#patterns</loc><priority>0.9</priority></url>
-  <url><loc>https://studiokhushi.example/index.html#collections</loc><priority>0.8</priority></url>
-  <url><loc>https://studiokhushi.example/index.html#services</loc><priority>0.7</priority></url>
-  <url><loc>https://studiokhushi.example/project.html</loc><priority>0.6</priority></url>
+  <url><loc>https://prabheen09876.github.io/khushi-ki-dukan/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://prabheen09876.github.io/khushi-ki-dukan/index.html#portfolio</loc><priority>0.9</priority></url>
+  <url><loc>https://prabheen09876.github.io/khushi-ki-dukan/index.html#patterns</loc><priority>0.9</priority></url>
+  <url><loc>https://prabheen09876.github.io/khushi-ki-dukan/index.html#collections</loc><priority>0.8</priority></url>
+  <url><loc>https://prabheen09876.github.io/khushi-ki-dukan/index.html#services</loc><priority>0.7</priority></url>
+  <url><loc>https://prabheen09876.github.io/khushi-ki-dukan/project.html</loc><priority>0.6</priority></url>
 </urlset>
