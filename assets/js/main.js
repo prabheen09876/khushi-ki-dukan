@@ -277,17 +277,16 @@
     c.innerHTML = PE.makePattern('Floral', 42, 'sand');
     const svg = c.querySelector('svg');
     if (svg) svg.style.opacity = '0.5';
+    c.style.transform = 'scale(1.08)';
     if (reduced) return;
-    let tx = 0, ty = 0;
     window.addEventListener('mousemove', (e) => {
       const nx = (e.clientX / window.innerWidth - 0.5);
       const ny = (e.clientY / window.innerHeight - 0.5);
-      tx = nx * -22; ty = ny * -22;
-      c.style.transform = `scale(1.1) translate(${tx}px, ${ty}px)`;
+      c.style.transform = `scale(1.1) translate(${nx * -22}px, ${ny * -22}px)`;
     }, { passive: true });
-    window.addEventListener('scroll', () => {
-      c.style.setProperty('--py', `${window.scrollY * 0.15}px`);
-    }, { passive: true });
+  }
+  function renderPortrait() {
+    const port = $('#portrait'); if (port) port.innerHTML = PE.makePortrait(3);
   }
 
   /* ---------------------------------------------------------
@@ -510,13 +509,17 @@
      --------------------------------------------------------- */
   function boot() {
     const yr = $('#year'); if (yr) yr.textContent = '2026';
-    renderHero();
+    renderHero(); renderPortrait();
     renderPortfolio();
     renderPatternFilters(); renderPatterns();
     renderProducts(); renderCollections(); renderPosts();
     renderQuotes(); renderServices(); renderInstagram();
     preloader(); navBehaviour(); menus(); search(); lightbox();
     reveals(); cursor(); scrollExtras(); cookie(); forms();
+    // PWA / offline caching — only over http(s), skipped on file://
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
