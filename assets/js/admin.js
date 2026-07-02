@@ -337,6 +337,15 @@
   /* ---------------------------------------------------------
      Boot
      --------------------------------------------------------- */
-  if (Store.isLoggedIn()) showDashboard();
-  else showLogin();
+  try {
+    if (typeof Store === 'undefined' || !Store) {
+      throw new Error('Data layer failed to load. Check that assets/js/store.js and the Supabase script loaded (no ad-blocker / offline), then hard-refresh.');
+    }
+    if (Store.isLoggedIn()) showDashboard();
+    else showLogin();
+  } catch (e) {
+    if (window.console) console.error('Admin boot error:', e);
+    try { showLogin(); } catch (e2) {}
+    throw e; // let the on-screen error trap surface it
+  }
 })();
