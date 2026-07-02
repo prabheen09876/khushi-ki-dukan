@@ -1,0 +1,13 @@
+{
+  "name": "Studio Khushi — Surface Pattern & Product Design",
+  "short_name": "Studio Khushi",
+  "description": "A living archive of seamless surface patterns, textile prints, products and brand systems.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f2ec",
+  "theme_color": "#222222",
+  "icons": [
+    { "src": "assets/img/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
