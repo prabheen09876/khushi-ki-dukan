@@ -368,6 +368,10 @@ h3.sub   { font-size: clamp(1.4rem, 2.6vw, 2.1rem); }
    ============================================================ */
 .masonry { columns: 3; column-gap: clamp(1rem, 2vw, 1.8rem); }
 .masonry > * { break-inside: avoid; margin-bottom: clamp(1rem, 2vw, 1.8rem); }
+.portfolio-empty { text-align: center; padding: clamp(3rem, 8vw, 6rem) 1.5rem;
+  border: 1.5px dashed var(--line); border-radius: var(--radius-lg); color: var(--fg-mute); }
+.portfolio-empty p { font-family: var(--serif); font-weight: 400; font-size: clamp(1.3rem, 3.5vw, 2rem);
+  letter-spacing: -0.01em; color: var(--fg-soft); }
 .grid-pins { column-count: 4; column-gap: clamp(0.8rem, 1.6vw, 1.4rem); }
 .grid-pins > * { break-inside: avoid; margin-bottom: clamp(0.8rem, 1.6vw, 1.4rem); }
 

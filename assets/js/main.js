@@ -13,17 +13,8 @@
      --------------------------------------------------------- */
   const REPEATS = ['Half-drop', 'Full drop', 'Brick', 'Mirror', 'Tossed', 'Ogee'];
 
-  const PROJECTS = [
-    { title: 'Marigold Season', cat: 'Surface Pattern', theme: 'Floral', pal: 'sand', desc: 'A festive floral repeat drawn for a Diwali homeware line.', repeat: 'Half-drop' },
-    { title: 'Terracotta Tiles', cat: 'Product Design', theme: 'Geometric', pal: 'clay', desc: 'Modular planter system with a hand-pressed clay finish.', repeat: 'Brick' },
-    { title: 'Little Safari', cat: 'Kids Collection', theme: 'Animals', pal: 'sage', desc: 'Playful animal prints for a toddler bedding range.', repeat: 'Tossed' },
-    { title: 'Block & Bloom', cat: 'Textile Prints', theme: 'Ethnic', pal: 'blush', desc: 'Ikat-inspired blockprint for a resort-wear capsule.', repeat: 'Mirror' },
-    { title: 'Paper Botanica', cat: 'Packaging', theme: 'Nature', pal: 'sage', desc: 'Botanical wrap system for an organic skincare brand.', repeat: 'Full drop' },
-    { title: 'Arcadia Chair', cat: 'Furniture Design', theme: 'Boho', pal: 'clay', desc: 'A caned lounge chair with an upholstered arch motif.', repeat: 'Ogee' },
-    { title: 'Confetti Hour', cat: 'Concept Design', theme: 'Abstract', pal: 'dusk', desc: 'Terrazzo-led identity concept for a dessert café.', repeat: 'Tossed' },
-    { title: 'Vessel Study', cat: '3D Visuals', theme: 'Modern', pal: 'ocean', desc: 'Rendered ceramics exploring ring-turned surfaces.', repeat: 'Full drop' },
-    { title: 'House of Kesar', cat: 'Branding', theme: 'Luxury', pal: 'ink', desc: 'A gilded identity for a heritage saffron house.', repeat: 'Half-drop' },
-  ];
+  // Portfolio projects are managed in the admin panel and stored in Supabase.
+  // The grid is populated live from the database (empty until you add one).
 
   const PATTERN_FILTERS = ['All', 'Floral', 'Kids', 'Geometric', 'Ethnic', 'Modern', 'Abstract', 'Minimal', 'Nature', 'Boho', 'Luxury', 'Seasonal', 'Animals', 'Festive'];
   const PATTERNS = [
@@ -94,7 +85,6 @@
   ];
 
   const SEARCH_INDEX = [
-    ...PROJECTS.map(p => ({ name: p.title, tag: 'Project' })),
     ...PATTERNS.map(p => ({ name: p[0], tag: 'Pattern' })),
     ...COLLECTIONS.map(c => ({ name: c[0], tag: 'Collection' })),
     ...PRODUCTS.map(p => ({ name: p[0], tag: 'Product' })),
@@ -111,28 +101,19 @@
   const observeNode = (n) => { if (revealIO && n) revealIO.observe(n); };
 
   /* ---------------------------------------------------------
-     RENDER: Portfolio (masonry swatches)
+     RENDER: Portfolio — projects come from the admin (Supabase)
      --------------------------------------------------------- */
-  function renderPortfolio() {
+  function renderPortfolio(projects) {
     const grid = $('#portfolioGrid'); if (!grid) return;
-    PROJECTS.forEach((p, i) => {
-      // vary art height for a real masonry rhythm
-      const tall = i % 3 === 1 ? 'style="aspect-ratio:3/4"' : (i % 3 === 2 ? 'style="aspect-ratio:4/3"' : 'style="aspect-ratio:1"');
-      const card = el(`
-        <a class="swatch rv" href="project.html?p=${encodeURIComponent(p.title)}" data-cursor="Open">
-          <div class="swatch__art" data-cat="${p.cat}" ${tall}>${PE.makePattern(p.theme, 7 + i * 13, p.pal)}</div>
-          <div class="swatch__body">
-            <h3 class="swatch__title">${p.title}</h3>
-            <p class="swatch__desc">${p.desc}</p>
-            <div class="swatch__spec">
-              <span class="chip chip--gold">${p.theme}</span>
-              <span>repeat · ${p.repeat}</span>
-              ${swatchDots([p.pal, PE.PALETTE_KEYS[(i + 2) % PE.PALETTE_KEYS.length]])}
-            </div>
-          </div>
-        </a>`);
-      grid.appendChild(card);
-    });
+    grid.innerHTML = '';
+    if (!projects || !projects.length) {
+      grid.classList.remove('masonry');
+      grid.appendChild(el(`<div class="portfolio-empty"><p>New projects are on their way.</p></div>`));
+      return;
+    }
+    grid.classList.add('masonry');
+    projects.forEach((p, i) => { const c = projectCard(p, i); grid.appendChild(c); observeNode(c); });
+    projects.forEach(p => SEARCH_INDEX.push({ name: p.title, tag: 'Project' }));
   }
 
   /* ---------------------------------------------------------
@@ -579,20 +560,15 @@
   }
 
   function applyStoreOverrides() {
-    if (!window.Store) return;
+    if (!window.Store) { renderPortfolio([]); return; }
     Store.getContent().then(content => {
       patchHero(content);
       patchSkills(content.skills);
       patchContact(content.contact);
     }).catch(() => {});
-    Store.getProjects().then(projects => {
-      if (!projects || !projects.length) return; // keep the demo grid when DB is empty
-      const grid = $('#portfolioGrid');
-      if (!grid) return;
-      grid.innerHTML = '';
-      projects.forEach((p, i) => { const c = projectCard(p, i); grid.appendChild(c); observeNode(c); });
-      projects.forEach(p => SEARCH_INDEX.push({ name: p.title, tag: 'Project' }));
-    }).catch(() => {});
+    Store.getProjects()
+      .then(projects => { renderPortfolio(projects); })
+      .catch(() => { renderPortfolio([]); });
   }
 
   /* ---------------------------------------------------------
@@ -601,7 +577,6 @@
   function boot() {
     const yr = $('#year'); if (yr) yr.textContent = '2026';
     renderHero(); renderPortrait();
-    renderPortfolio();
     renderPatternFilters(); renderPatterns();
     renderProducts(); renderCollections(); renderPosts();
     renderQuotes(); renderServices(); renderInstagram();
