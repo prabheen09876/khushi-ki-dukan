@@ -1,0 +1,16 @@
+# Netlify configuration for Studio Khushi.
+# This is a plain static site (no build step) — publish the repo root as-is.
+[build]
+  publish = "."
+
+# Long-cache the fingerprint-free assets lightly; HTML stays fresh so admin
+# edits (served from Supabase at runtime) and code changes show immediately.
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
