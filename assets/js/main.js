@@ -10,69 +10,13 @@
 
   /* ---------------------------------------------------------
      CONTENT — written in the designer's voice, domain-true.
+     ------------------------------------------------------------
+     Portfolio projects are managed in the admin panel (Supabase)
+     and rendered live. The Pattern Library, Products, Collections,
+     Testimonials, Blog and Instagram sections are not yet wired to
+     the admin, so they show a "coming soon" placeholder instead of
+     sample data. Only Services below is still static content.
      --------------------------------------------------------- */
-  const REPEATS = ['Half-drop', 'Full drop', 'Brick', 'Mirror', 'Tossed', 'Ogee'];
-
-  // Portfolio projects are managed in the admin panel and stored in Supabase.
-  // The grid is populated live from the database (empty until you add one).
-
-  const PATTERN_FILTERS = ['All', 'Floral', 'Kids', 'Geometric', 'Ethnic', 'Modern', 'Abstract', 'Minimal', 'Nature', 'Boho', 'Luxury', 'Seasonal', 'Animals', 'Festive'];
-  const PATTERNS = [
-    ['Wild Marigold', 'Nature Collection', 'Floral', 'sand'],
-    ['Tiny Explorers', 'Kids Collection', 'Kids', 'sage'],
-    ['Kilim Steps', 'Indian Heritage', 'Ethnic', 'clay'],
-    ['Soft Terrazzo', 'Minimal Collection', 'Abstract', 'dusk'],
-    ['Fern & Dew', 'Nature Collection', 'Nature', 'sage'],
-    ['Gilded Scallop', 'Luxury Collection', 'Luxury', 'ink'],
-    ['Hairline Grid', 'Minimal Collection', 'Minimal', 'ivory'],
-    ['Sunday Arches', 'Home Decor', 'Boho', 'blush'],
-    ['Meadow Toss', 'Nature Collection', 'Floral', 'sage'],
-    ['Zigzag Sorbet', 'Kids Collection', 'Geometric', 'blush'],
-    ['Midnight Rings', 'Minimal Collection', 'Modern', 'ocean'],
-    ['Little Paws', 'Kids Collection', 'Animals', 'clay'],
-    ['Festival Sparks', 'Festival Collection', 'Festive', 'sand'],
-    ['Monsoon Waves', 'Home Decor', 'Seasonal', 'ocean'],
-    ['Ikat Diamond', 'Indian Heritage', 'Ethnic', 'clay'],
-    ['Petal Half-Drop', 'Luxury Collection', 'Floral', 'blush'],
-    ['Sage Chevron', 'Minimal Collection', 'Geometric', 'sage'],
-    ['Golden Bloom', 'Luxury Collection', 'Floral', 'ink'],
-  ];
-  const FORMATS = ['AI', 'SVG', 'PSD', 'PNG', 'JPEG'];
-
-  const COLLECTIONS = [
-    ['Indian Heritage', 24, 'Ethnic', 'clay', 'Block prints, ikats and kalamkari, reimagined for modern interiors.'],
-    ['Nature Collection', 18, 'Nature', 'sage', 'Botanicals, ferns and meadows drawn from morning walks.'],
-    ['Kids Collection', 16, 'Kids', 'blush', 'Gentle, joyful prints for nurseries and small humans.'],
-    ['Luxury Collection', 12, 'Luxury', 'ink', 'Gilded damasks and quiet opulence for premium goods.'],
-    ['Festival Collection', 14, 'Festive', 'sand', 'Marigold, diya and celebration motifs for the season.'],
-    ['Minimal Collection', 20, 'Minimal', 'dusk', 'Restrained repeats for brands that speak softly.'],
-  ];
-
-  const PRODUCTS = [
-    ['Arcadia Lounge Chair', 'Furniture', 'Boho', 'clay', 'Caned oak frame · linen seat'],
-    ['Bloom Ceramic Set', 'Tableware', 'Floral', 'sand', 'Six-piece · hand-glazed stoneware'],
-    ['Fold Planter Trio', 'Home Object', 'Geometric', 'sage', 'Recycled terracotta · nesting'],
-    ['Petal Wall Sconce', 'Lighting', 'Nature', 'blush', 'Brass · frosted glass diffuser'],
-    ['Toss Storage Tins', 'Packaging', 'Abstract', 'dusk', 'Tinplate · three sizes'],
-    ['Heritage Tea Caddy', 'Packaging', 'Luxury', 'ink', 'Gilded card · magnetic close'],
-  ];
-
-  const POSTS = [
-    ['Designing a repeat that never tiles', 'Work Process', 'Nature', 'sage', 'Mar 2026', '6 min'],
-    ['Inside my Diwali colour studies', 'Behind the Scenes', 'Festive', 'sand', 'Feb 2026', '4 min'],
-    ['From sketchbook to seamless SVG', 'Sketchbook', 'Floral', 'blush', 'Feb 2026', '8 min'],
-    ['Why half-drop still wins in textiles', 'Design', 'Ethnic', 'clay', 'Jan 2026', '5 min'],
-    ['The materials I keep returning to', 'Materials', 'Abstract', 'dusk', 'Jan 2026', '7 min'],
-    ['Colour trends I am watching in 2026', 'Trends', 'Modern', 'ocean', 'Dec 2025', '5 min'],
-  ];
-
-  const QUOTES = [
-    ['Khushi translated our brand into a print language we never knew we needed. Sell-through on the launch capsule beat forecast by 40%.', 'Ananya Rao', 'Founder · Rasa Living', 'blush'],
-    ['The most collaborative designer we have worked with. Files arrived pristine, layered and production-ready.', 'Marcus Feld', 'Creative Dir · Nord Textiles', 'ocean'],
-    ['Our nursery range sold out in ten days. The patterns simply feel loved.', 'Priya Menon', 'Buyer · Little Fern', 'sage'],
-    ['She thinks like a product designer and draws like an artist. Rare combination.', 'David Cole', 'Head of Design · Maison Kesar', 'ink'],
-  ];
-
   const SERVICES = [
     ['Surface Pattern Design', 'Seamless repeats built for real production — apparel, home and stationery.', 'from ₹35k / print', 'M4 3 L20 3 L20 21 L4 21 Z M4 9 L20 9 M4 15 L20 15 M10 3 L10 21'],
     ['Product Design', 'Concept to prototype for homeware, furniture and lifestyle objects.', 'project based', 'M12 2 L21 7 L21 17 L12 22 L3 17 L3 7 Z M12 2 L12 22 M3 7 L21 7'],
@@ -84,21 +28,25 @@
     ['Creative Direction', 'Ongoing art direction for collections, campaigns and seasonal drops.', 'retainer', 'M2 12 C6 4 18 4 22 12 C18 20 6 20 2 12 Z M12 9 A3 3 0 1 0 12 15 A3 3 0 1 0 12 9'],
   ];
 
-  const SEARCH_INDEX = [
-    ...PATTERNS.map(p => ({ name: p[0], tag: 'Pattern' })),
-    ...COLLECTIONS.map(c => ({ name: c[0], tag: 'Collection' })),
-    ...PRODUCTS.map(p => ({ name: p[0], tag: 'Product' })),
-    ...POSTS.map(p => ({ name: p[0], tag: 'Blog' })),
-  ];
+  // Only real, admin-published projects are searchable; they are
+  // pushed into this index as the portfolio renders (see renderPortfolio).
+  const SEARCH_INDEX = [];
 
   /* small helpers */
   const el = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
-  const swatchDots = (keys) => `<span class="dots">${keys.map(k => `<i style="background:${PE.PALETTES[k][1]}"></i>`).join('')}</span>`;
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 
   /* shared reveal observer (also used to animate DB-injected nodes) */
   let revealIO = null;
   const observeNode = (n) => { if (revealIO && n) revealIO.observe(n); };
+
+  /* Sections not yet wired to the admin show a "coming soon" placeholder.
+     Drop any grid/flex layout class so the note sits full-width. */
+  function emptyState(container, message) {
+    if (!container) return;
+    container.classList.remove('masonry', 'grid-pins', 'products', 'posts', 'quotes', 'ig-grid');
+    container.innerHTML = `<div class="portfolio-empty"><p>${esc(message)}</p></div>`;
+  }
 
   /* ---------------------------------------------------------
      RENDER: Portfolio — projects come from the admin (Supabase)
@@ -117,119 +65,33 @@
   }
 
   /* ---------------------------------------------------------
-     RENDER: Pattern Library (Pinterest pins + filters)
+     RENDER: Pattern Library — placeholder until wired to the admin.
+     The filter bar is meaningless with no patterns, so it's hidden.
      --------------------------------------------------------- */
   function renderPatternFilters() {
     const bar = $('#patternFilters'); if (!bar) return;
-    PATTERN_FILTERS.forEach((f, i) => {
-      const b = el(`<button class="filter${i === 0 ? ' active' : ''}" data-filter="${f}">${f}</button>`);
-      bar.appendChild(b);
-    });
-    bar.addEventListener('click', (e) => {
-      const btn = e.target.closest('.filter'); if (!btn) return;
-      $$('.filter', bar).forEach(x => x.classList.remove('active'));
-      btn.classList.add('active');
-      const f = btn.dataset.filter;
-      $$('#patternGrid .pin').forEach(pin => {
-        const show = f === 'All' || pin.dataset.theme === f;
-        pin.style.display = show ? '' : 'none';
-      });
-    });
+    bar.innerHTML = '';
+    bar.style.display = 'none';
   }
   function renderPatterns() {
-    const grid = $('#patternGrid'); if (!grid) return;
-    PATTERNS.forEach((pt, i) => {
-      const [name, coll, theme, pal] = pt;
-      const repeat = REPEATS[i % REPEATS.length];
-      const variants = [pal, PE.PALETTE_KEYS[(i + 1) % PE.PALETTE_KEYS.length], PE.PALETTE_KEYS[(i + 4) % PE.PALETTE_KEYS.length]];
-      const ar = i % 4 === 0 ? '4/5' : (i % 4 === 2 ? '1' : '3/4');
-      const card = el(`
-        <div class="swatch pin rv" data-theme="${theme}" data-cursor="View">
-          <div class="swatch__art" data-cat="${theme}" style="aspect-ratio:${ar}">
-            ${PE.makePattern(theme, 101 + i * 9, pal)}
-            <div class="swatch__actions">
-              <button class="mini-btn js-preview" data-name="${name}" data-theme="${theme}" data-seed="${101 + i * 9}" data-pal="${pal}">Preview</button>
-              <button class="mini-btn">License</button>
-              <button class="mini-btn mini-btn--solid">Buy</button>
-            </div>
-          </div>
-          <div class="swatch__body">
-            <h3 class="swatch__title" style="font-size:1.1rem">${name}</h3>
-            <p class="swatch__desc" style="font-size:0.82rem">${coll} · ${theme}</p>
-            <div class="swatch__spec">
-              <span>repeat · ${repeat}</span>
-              ${swatchDots(variants)}
-            </div>
-            <div class="swatch__spec" style="border:0;padding-top:0.5rem">
-              ${FORMATS.map(f => `<span class="chip">${f}</span>`).join('')}
-            </div>
-          </div>
-        </div>`);
-      grid.appendChild(card);
-    });
+    emptyState($('#patternGrid'), 'New patterns are on their way.');
   }
 
   /* ---------------------------------------------------------
-     RENDER: Products / Collections / Blog / Testimonials / Services / IG
+     RENDER: Products / Collections / Blog / Testimonials / IG —
+     placeholders until wired to the admin. Services stays static.
      --------------------------------------------------------- */
   function renderProducts() {
-    const grid = $('#productGrid'); if (!grid) return;
-    PRODUCTS.forEach((p, i) => {
-      const [title, kind, theme, pal, spec] = p;
-      grid.appendChild(el(`
-        <a class="product rv" href="project.html?p=${encodeURIComponent(title)}" data-cursor="Open">
-          <div class="product__art">${PE.makePattern(theme, 301 + i * 17, pal)}<span class="product__num mono">P.0${i + 1}</span></div>
-          <div class="product__body">
-            <p class="eyebrow" style="margin-bottom:0.6rem">${kind}</p>
-            <h3>${title}</h3>
-            <p class="muted" style="font-size:0.88rem">${spec}</p>
-          </div>
-        </a>`));
-    });
+    emptyState($('#productGrid'), 'New products are on their way.');
   }
   function renderCollections() {
-    const wrap = $('#collectionList'); if (!wrap) return;
-    COLLECTIONS.forEach((c, i) => {
-      const [name, count, theme, pal, desc] = c;
-      wrap.appendChild(el(`
-        <a class="collection rv" href="#patterns" data-cursor="Explore">
-          <div class="collection__art">${PE.makePattern(theme, 501 + i * 11, pal)}</div>
-          <div class="collection__body">
-            <span class="collection__count">Collection ${String(i + 1).padStart(2, '0')} — ${count} designs</span>
-            <h3>${name}</h3>
-            <p class="muted">${desc}</p>
-            <span class="tlink" style="margin-top:0.4rem">Open gallery <span aria-hidden="true">→</span></span>
-          </div>
-        </a>`));
-    });
+    emptyState($('#collectionList'), 'New collections are on their way.');
   }
   function renderPosts() {
-    const grid = $('#postGrid'); if (!grid) return;
-    POSTS.forEach((p, i) => {
-      const [title, cat, theme, pal, date, read] = p;
-      grid.appendChild(el(`
-        <a class="post rv" href="#" data-cursor="Read">
-          <div class="post__art">${PE.makePattern(theme, 701 + i * 23, pal)}</div>
-          <div class="post__meta"><span class="cat">${cat}</span><span>${date}</span><span>${read} read</span></div>
-          <h3>${title}</h3>
-          <p>A short field note from the studio on process, colour and craft.</p>
-        </a>`));
-    });
+    emptyState($('#postGrid'), 'New field notes are on their way.');
   }
   function renderQuotes() {
-    const row = $('#quoteRow'); if (!row) return;
-    QUOTES.forEach((q, i) => {
-      const [text, who, role, pal] = q;
-      row.appendChild(el(`
-        <figure class="quote rv">
-          <div class="quote__stars" aria-label="Five stars">★★★★★</div>
-          <blockquote class="quote__text">“${text}”</blockquote>
-          <figcaption class="quote__who">
-            <span class="quote__ava">${PE.makePattern('Abstract', 801 + i * 5, pal)}</span>
-            <span><b>${who}</b><span>${role}</span></span>
-          </figcaption>
-        </figure>`));
-    });
+    emptyState($('#quoteRow'), 'Client stories are on their way.');
   }
   function renderServices() {
     const grid = $('#serviceGrid'); if (!grid) return;
@@ -248,11 +110,7 @@
     });
   }
   function renderInstagram() {
-    const grid = $('#igGrid'); if (!grid) return;
-    const themes = ['Floral', 'Nature', 'Geometric', 'Ethnic', 'Kids', 'Luxury', 'Abstract', 'Boho', 'Festive', 'Modern', 'Nature', 'Floral'];
-    themes.forEach((t, i) => {
-      grid.appendChild(el(`<a class="ig-cell" href="#" aria-label="Instagram post" data-cursor="View">${PE.makePattern(t, 901 + i * 3, PE.PALETTE_KEYS[i % PE.PALETTE_KEYS.length])}</a>`));
-    });
+    emptyState($('#igGrid'), 'New posts are on their way.');
   }
 
   /* ---------------------------------------------------------
